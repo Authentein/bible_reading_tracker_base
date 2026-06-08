@@ -1,15 +1,15 @@
 from datetime import date
 
-#define today
+# define today
 today = date.today()
 
-#define day of the year (1-365)
+# define day of the year (1-365)
 day_of_the_year = today.timetuple().tm_yday
 
-#define 'day' as being today
+# define 'day' as being today
 day = today.day
 
-#if/else defining first half and second half of the month
+# if/else defining first half and second half of the month
 if day <= 14:
     main_reading = "1 Kings"
 
@@ -21,7 +21,7 @@ psalms = (day - 1) % 150 + 1
 
 proverbs = (day - 1) % 31 + 1
 
-#print the results, all f str.
+# print the results, all f str.
 print(f"Day of the year: {day_of_the_year}")
 print(f"Read: {main_reading}, Psalms {psalms}, Proverbs {proverbs}")
 
