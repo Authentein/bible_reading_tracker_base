@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Bible Reading Plan</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Bible Plan">
+<meta name="theme-color" content="#0b0d12">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--bg:#0b0d12;--panel:#0f1218;--panel2:#12151c;--line:#1a2230;--ink:#dde0e8;--white:#fff;
+  --dim:#7a9ab8;--eyebrow:#6a90bb;--muted:#556677;--green:#7edfa0;--gold:#dfca7e;--purple:#c89edf;
+  --blue:#7eb8df;--mono:'SF Mono','Fira Code',Consolas,monospace}
+body{background:var(--bg);color:var(--ink);font-family:Georgia,serif;min-height:100vh;padding-bottom:40px}
+button{font-family:inherit;cursor:pointer}
+.hdr{background:linear-gradient(135deg,#1a2a45 0%,#0d1420 100%);padding:14px 18px;border-bottom:1px solid #2a3a55}
+.hdr .row{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.eyebrow{font-size:10px;letter-spacing:.2em;color:var(--eyebrow);font-family:var(--mono);text-transform:uppercase;margin-bottom:3px}
+.title{font-size:20px;font-weight:bold;color:var(--white)}
+.sub{font-size:11px;color:var(--dim);margin-top:2px}
+.yearsel{display:flex;gap:6px;align-items:center;font-family:var(--mono);font-size:11px;color:var(--dim)}
+.btn{background:#16202e;border:1px solid #2a3a55;color:var(--ink);border-radius:5px;padding:5px 10px;font-size:12px;font-family:var(--mono)}
+.btn:disabled{opacity:.35;cursor:default}
+.btn.on{background:#1a2e4a;border-color:var(--blue);color:var(--white)}
+.bar{background:var(--panel);border-bottom:1px solid var(--line);padding:12px 16px}
+.stack{max-width:728px;margin:0 auto;display:flex;flex-direction:column;gap:6px}
+.stack .chip{display:block;padding:7px 12px;font-size:13px;letter-spacing:.03em}
+.stack .t1{background:#08201f;border-color:#2f7a74;color:#6fd8cf}
+.stack .t2{background:#26160c;border-color:#7a4a2a;color:#e8a374}
+.stack .t3{background:#260c16;border-color:#7a2f48;color:#ec8aa6}
+.stack .track{width:100%;margin-top:4px}
+.chip{background:#0a2a1a;border:1px solid #3a8a5a;border-radius:4px;padding:2px 10px;font-size:11px;color:var(--green);font-family:var(--mono);font-weight:bold}
+.chip.gold{background:#241f0f;border-color:#6a5a2a;color:var(--gold)}
+.chip.purple{background:#1a0f24;border-color:#4a3a66;color:var(--purple)}
+.track{flex:1;min-width:120px;height:6px;background:#1a2230;border-radius:3px;overflow:hidden}
+.track i{display:block;height:100%;background:linear-gradient(90deg,#3a8a5a,var(--green))}
+.tabs{display:flex;border-bottom:1px solid var(--line);background:var(--panel2)}
+.tab{flex:1;padding:11px 8px;border:none;background:transparent;color:var(--muted);font-family:var(--mono);font-size:12px;border-bottom:2px solid transparent}
+.tab.on{color:var(--white);border-bottom-color:var(--blue);font-weight:bold}
+.wrap{max-width:760px;margin:0 auto;padding:16px}
+.daynav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}
+.daynav .when{text-align:center;flex:1}
+.daynav .d1{font-size:17px;color:var(--white);font-weight:bold}
+.daynav .d2{font-family:var(--mono);font-size:11px;color:var(--dim);margin-top:2px}
+.card{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:10px}
+.read{display:flex;align-items:center;gap:12px;border-left:3px solid var(--blue)}
+.read.ps{border-left-color:var(--purple)} .read.pr{border-left-color:var(--gold)}
+.read .lbl{font-family:var(--mono);font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted)}
+.read .ref{font-size:18px;color:var(--white);margin-top:2px}
+.read .grow{flex:1}
+.read .open{text-decoration:none;white-space:nowrap;font-family:var(--mono);font-size:11px;color:var(--blue);background:none;border:1px solid #2a3a55;border-radius:5px;padding:5px 9px}
+.done-btn{width:100%;padding:13px;border-radius:8px;border:1px solid #3a8a5a;background:#0a2a1a;color:var(--green);font-family:var(--mono);font-size:14px;font-weight:bold;margin-top:4px}
+.done-btn.is{background:var(--green);color:#06140c}
+.note{font-size:11px;color:var(--muted);font-style:italic;line-height:1.5;margin-top:10px}
+.mtabs{display:flex;gap:4px;overflow-x:auto;padding-bottom:8px;margin-bottom:6px}
+.mtabs .btn{flex:0 0 auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:#1a2e4a;color:var(--white);font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.05em;padding:7px 6px;text-align:left}
+td{padding:7px 6px;border-bottom:1px solid #141a24;vertical-align:middle}
+tr.past td{color:var(--muted)}
+tr.today td{background:#2a2410;color:var(--gold);font-weight:bold}
+tr.row{cursor:pointer}
+tr.row:hover td{background:#141a24}
+td.c{text-align:center;font-family:var(--mono)}
+.cb{width:20px;height:20px;border-radius:4px;border:1px solid #2a3a55;display:inline-flex;align-items:center;justify-content:center;font-size:13px;color:#06140c}
+.cb.on{background:var(--green);border-color:var(--green)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:12px}
+.stat .k{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.stat .v{font-size:24px;color:var(--white);margin-top:4px;font-family:var(--mono)}
+.stat .v small{font-size:12px;color:var(--dim)}
+.foot{text-align:center;font-family:var(--mono);font-size:10px;color:#334455;margin-top:22px;line-height:1.8}
+@media (max-width:520px){.title{font-size:17px}.hide-sm{display:none}td,th{padding:6px 4px}}
+</style>
+</head>
+<body>
+<div class="hdr"><div class="row">
+  <div>
+    <div class="eyebrow">Daily Scripture Reading</div>
+    <div class="title">One-Year Bible Reading Plan</div>
+    <div class="sub">Old &amp; New Testament · Daily Psalm · Daily Proverb</div>
+  </div>
+  <div class="yearsel">
+    <button class="btn" id="yPrev">◀</button><span id="yLbl"></span><button class="btn" id="yNext">▶</button>
+  </div>
+</div></div>
+
+<div class="bar"><div class="stack">
+  <span class="chip t1" id="chipDay"></span>
+  <span class="chip t2" id="chipDone"></span>
+  <span class="chip t3" id="chipStreak"></span>
+  <div class="track"><i id="trackFill"></i></div>
+</div></div>
+
+<div class="tabs">
+  <button class="tab on" data-v="day">Today</button>
+  <button class="tab" data-v="plan">Full Plan</button>
+  <button class="tab" data-v="stats">Progress</button>
+</div>
+
+<div class="wrap" id="view"></div>
+
+<script>
+const CANON=[["Genesis",50],["Exodus",40],["Leviticus",27],["Numbers",36],["Deuteronomy",34],["Joshua",24],["Judges",21],["Ruth",4],["1 Samuel",31],["2 Samuel",24],["1 Kings",22],["2 Kings",25],["1 Chronicles",29],["2 Chronicles",36],["Ezra",10],["Nehemiah",13],["Esther",10],["Job",42],["Ecclesiastes",12],["Song of Solomon",8],["Isaiah",66],["Jeremiah",52],["Lamentations",5],["Ezekiel",48],["Daniel",12],["Hosea",14],["Joel",3],["Amos",9],["Obadiah",1],["Jonah",4],["Micah",7],["Nahum",3],["Habakkuk",3],["Zephaniah",3],["Haggai",2],["Zechariah",14],["Malachi",4],["Matthew",28],["Mark",16],["Luke",24],["John",21],["Acts",28],["Romans",16],["1 Corinthians",16],["2 Corinthians",13],["Galatians",6],["Ephesians",6],["Philippians",4],["Colossians",4],["1 Thessalonians",5],["2 Thessalonians",3],["1 Timothy",6],["2 Timothy",4],["Titus",3],["Philemon",1],["Hebrews",13],["James",5],["1 Peter",5],["2 Peter",3],["1 John",5],["2 John",1],["3 John",1],["Jude",1],["Revelation",22]];
+const TOTAL=CANON.reduce((s,b)=>s+b[1],0);
+const MONTHS=["January","February","March","April","May","June","July","August","September","October","November","December"];
+const DOW=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+const STORE="bibleplan_v1";
+
+function ref(i){for(const [b,c] of CANON){if(i<c)return [b,i+1];i-=c;}return ["Revelation",22];}
+function daysIn(y){return (new Date(y,11,31)-new Date(y,0,1))/864e5+1;}
+function mainReading(y,d){const n=daysIn(y);const s=Math.floor(d*TOTAL/n),e=Math.floor((d+1)*TOTAL/n)-1;
+  const [b1,c1]=ref(s),[b2,c2]=ref(e);
+  return b1===b2?(c1===c2?`${b1} ${c1}`:`${b1} ${c1}–${c2}`):`${b1} ${c1} – ${b2} ${c2}`;}
+function psalm(d){return d%150+1;}
+function mainSearch(y,d){const n=daysIn(y);const s=Math.floor(d*TOTAL/n),e=Math.floor((d+1)*TOTAL/n)-1;const g=[];
+  for(let i=s;i<=e;i++){const [b,c]=ref(i);const last=g[g.length-1];if(last&&last.b===b)last.e=c;else g.push({b,s:c,e:c});}
+  return g.map(x=>x.s===x.e?`${x.b} ${x.s}`:`${x.b} ${x.s}-${x.e}`).join("; ");}
+function bgLink(q){return "https://www.biblegateway.com/passage/?search="+encodeURIComponent(q)+"&version=KJV";}
+function dateOf(y,d){return new Date(y,0,1+d);}
+function dayIndex(date){return Math.round((new Date(date.getFullYear(),date.getMonth(),date.getDate())-new Date(date.getFullYear(),0,1))/864e5);}
+function key(y,d){return y+"-"+d;}
+
+let state={done:{}};
+try{const s=localStorage.getItem(STORE);if(s)state=JSON.parse(s);}catch(e){}
+function save(){try{localStorage.setItem(STORE,JSON.stringify(state));}catch(e){}}
+
+const now=new Date();
+let year=now.getFullYear(), cur=dayIndex(now), view="day", month=now.getMonth(), openText=null;
+const todayIdx=()=>year===now.getFullYear()?dayIndex(now):-1;
+
+function streak(){if(year!==now.getFullYear())return 0;let s=0,d=dayIndex(now);
+  if(!state.done[key(year,d)])d--;while(d>=0&&state.done[key(year,d)]){s++;d--;}return s;}
+function doneCount(){let n=0;for(let d=0;d<daysIn(year);d++)if(state.done[key(year,d)])n++;return n;}
+
+
+function renderBar(){const n=daysIn(year),dc=doneCount(),ti=todayIdx();
+  document.getElementById("yLbl").textContent=year;
+  document.getElementById("chipDay").textContent=ti>=0?`Current Day: ${ti+1} of ${n}`:`Total Days: ${n}`;
+  document.getElementById("chipDone").textContent=`Total Read: ${dc} Day${dc===1?"":"s"}`;
+  document.getElementById("chipStreak").textContent=(s=>`Current Streak: ${s} Day${s===1?"":"s"}`)(streak());
+  document.getElementById("trackFill").style.width=(dc/n*100)+"%";}
+
+function renderDay(){const n=daysIn(year);cur=Math.max(0,Math.min(n-1,cur));
+  const dt=dateOf(year,cur),ps=psalm(cur),pr=dt.getDate(),isDone=!!state.done[key(year,cur)],isToday=cur===todayIdx();
+  return `<div class="daynav">
+    <button class="btn" id="dPrev" ${cur===0?"disabled":""}>◀</button>
+    <div class="when"><div class="d1">${DOW[dt.getDay()]}, ${MONTHS[dt.getMonth()]} ${dt.getDate()}</div>
+      <div class="d2">DAY ${cur+1} OF ${n}${isToday?" · TODAY":""}</div></div>
+    <button class="btn" id="dNext" ${cur===n-1?"disabled":""}>▶</button></div>
+  ${!isToday&&todayIdx()>=0?`<div style="text-align:center;margin-bottom:10px"><button class="btn" id="goToday">● Jump to today</button></div>`:""}
+  <div class="card read"><div class="grow"><div class="lbl">Main Reading</div><div class="ref">${mainReading(year,cur)}</div></div>
+    <a class="open" href="${bgLink(mainSearch(year,cur))}" target="_blank" rel="noopener">Read ↗</a>
+</div>
+  <div class="card read ps"><div class="grow"><div class="lbl">Psalm</div><div class="ref">Psalm ${ps}</div></div>
+    <a class="open" href="${bgLink("Psalm "+ps)}" target="_blank" rel="noopener">Read ↗</a>
+</div>
+  <div class="card read pr"><div class="grow"><div class="lbl">Proverbs</div><div class="ref">Proverbs ${pr}</div></div>
+    <a class="open" href="${bgLink("Proverbs "+pr)}" target="_blank" rel="noopener">Read ↗</a>
+</div>
+  <button class="done-btn ${isDone?"is":""}" id="toggleDone">${isDone?"✓ Read — tap to undo":"Mark today's reading complete"}</button>`;}
+
+function renderPlan(){const ti=todayIdx();let rows="";
+  const first=dayIndex(new Date(year,month,1)),last=dayIndex(new Date(year,month+1,0));
+  for(let d=first;d<=last;d++){const dt=dateOf(year,d),on=!!state.done[key(year,d)];
+    const cls=d===ti?"today":(ti>=0&&d<ti?"past":"");
+    rows+=`<tr class="row ${cls}" data-day="${d}">
+      <td class="c"><span class="cb ${on?"on":""}" data-check="${d}">${on?"✓":""}</span></td>
+      <td class="c hide-sm">${d+1}</td><td>${DOW[dt.getDay()]} ${dt.getDate()}</td>
+      <td>${mainReading(year,d)}</td><td class="c">${psalm(d)}</td><td class="c">${dt.getDate()}</td></tr>`;}
+  return `<div class="mtabs">${MONTHS.map((m,i)=>`<button class="btn ${i===month?"on":""}" data-month="${i}">${m.slice(0,3)}</button>`).join("")}</div>
+  <table><thead><tr><th style="width:34px">✓</th><th class="hide-sm" style="width:40px">Day</th><th>Date</th><th>Main Reading</th><th style="width:48px">Ps</th><th style="width:48px">Prov</th></tr></thead>
+  <tbody>${rows}</tbody></table>
+  <div class="note">Tap a box to check a day off. Tap a row to open that day.</div>`;}
+
+function renderStats(){const n=daysIn(year),ti=todayIdx(),dc=doneCount();
+  let chapters=0;for(let d=0;d<n;d++)if(state.done[key(year,d)])chapters+=Math.floor((d+1)*TOTAL/n)-Math.floor(d*TOTAL/n);
+  let behind=0;if(ti>=0)for(let d=0;d<=ti;d++)if(!state.done[key(year,d)])behind++;
+  const byMonth=MONTHS.map((m,i)=>{const a=dayIndex(new Date(year,i,1)),b=dayIndex(new Date(year,i+1,0));let c=0;for(let d=a;d<=b;d++)if(state.done[key(year,d)])c++;
+    return `<div style="display:flex;align-items:center;gap:10px;margin:6px 0;font-family:var(--mono);font-size:11px"><span style="width:30px;color:var(--dim)">${m.slice(0,3)}</span>
+      <div class="track"><i style="width:${c/(b-a+1)*100}%"></i></div><span style="width:52px;text-align:right">${c}/${b-a+1}</span></div>`;}).join("");
+  return `<div class="stats">
+    <div class="card stat"><div class="k">Days read</div><div class="v">${dc} <small>/ ${n}</small></div></div>
+    <div class="card stat"><div class="k">Chapters read</div><div class="v">${chapters} <small>/ ${TOTAL}</small></div></div>
+    <div class="card stat"><div class="k">Current streak</div><div class="v">${streak()} <small>days</small></div></div>
+    <div class="card stat"><div class="k">Unread through today</div><div class="v">${ti>=0?behind:"—"} <small>days</small></div></div></div>
+  <div class="card"><div class="read" style="border:none;display:block"><div class="lbl" style="margin-bottom:6px">By month</div>${byMonth}</div></div>
+  <div style="text-align:center;margin-top:14px"><button class="btn" id="markThrough">Mark all days through today as read</button>
+  <button class="btn" id="resetYear" style="margin-left:6px">Reset ${year}</button></div>
+  <div class="note">“Mark all through today” is for catching your tracker up to where you actually are in your reading.</div>`;}
+
+function render(){renderBar();
+  document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("on",t.dataset.v===view));
+  const v=document.getElementById("view");
+  v.innerHTML=view==="day"?renderDay():view==="plan"?renderPlan():renderStats();
+  const on=v.querySelector(".mtabs .btn.on");if(on)on.scrollIntoView({inline:"center",block:"nearest"});}
+
+document.addEventListener("click",e=>{const t=e.target.closest("button,[data-check],tr.row");if(!t)return;
+  if(t.classList.contains("tab")){view=t.dataset.v;if(view==="plan")month=dateOf(year,cur).getMonth();render();return;}
+  if(t.id==="yPrev"||t.id==="yNext"){year+=t.id==="yNext"?1:-1;cur=year===now.getFullYear()?dayIndex(now):0;month=year===now.getFullYear()?now.getMonth():0;openText=null;render();return;}
+  if(t.id==="dPrev"){cur--;openText=null;render();return;}
+  if(t.id==="dNext"){cur++;openText=null;render();return;}
+  if(t.id==="goToday"){cur=dayIndex(now);openText=null;render();return;}
+  if(t.id==="toggleDone"){const k=key(year,cur);if(state.done[k])delete state.done[k];else state.done[k]=1;save();render();return;}
+  if(t.dataset.month!==undefined){month=+t.dataset.month;render();return;}
+  if(t.dataset.check!==undefined){e.stopPropagation();const k=key(year,+t.dataset.check);if(state.done[k])delete state.done[k];else state.done[k]=1;save();render();return;}
+  if(t.classList.contains("row")){cur=+t.dataset.day;view="day";openText=null;render();window.scrollTo(0,0);return;}
+  if(t.id==="markThrough"){const ti=todayIdx();if(ti<0)return;if(confirm(`Mark days 1–${ti+1} of ${year} as read?`)){for(let d=0;d<=ti;d++)state.done[key(year,d)]=1;save();render();}return;}
+  if(t.id==="resetYear"){if(confirm(`Clear all ${year} progress?`)){for(let d=0;d<daysIn(year);d++)delete state.done[key(year,d)];save();render();}return;}
+});
+try{render();}catch(err){document.getElementById("view").innerHTML=`<div class="card" style="color:#df7e7e">Something went wrong loading the plan: ${err.message}</div>`;}
+</script>
+</body>
+</html>
